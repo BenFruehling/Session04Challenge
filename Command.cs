@@ -13,6 +13,7 @@ using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using forms = System.Windows.Forms;
 using System.Windows.Forms.VisualStyles;
+using static Autodesk.Revit.DB.SpecTypeId;
 
 #endregion
 
@@ -33,10 +34,15 @@ namespace Session04Challenge
             Application app = uiapp.Application;
             Document doc = uidoc.Document;
 
-            //Get Started
+            //1.prompt user to select documents
 
             TaskDialog.Show("Hello", "Select Model Lines");
-
+            
+            // 2.filter selected elements
+            // 3.Get Level and types
+            //4.Loop Through Selected Curve Element
+            // 5.Get Graphic Style for curve and curve element
+            //6.Use Swithch Statement to create walls, ducts and pipes
             //Declare Variables
             IList<Element> pickList = uidoc.Selection.PickElementsByRectangle("Select elements");
 
@@ -74,8 +80,8 @@ namespace Session04Challenge
             {
 
                 Curve Curve1 = Currentcurve.GeometryCurve;
-               XYZ startPoint = Currentcurve.GeometryCurve.GetEndPoint( 0 );
-               XYZ endPoint = Currentcurve.GeometryCurve.GetEndPoint( 1 );
+               //XYZ startPoint = Currentcurve.GeometryCurve.GetEndPoint( 0 );
+               //XYZ endPoint = Currentcurve.GeometryCurve.GetEndPoint( 1 );
                 GraphicsStyle currentGS = Currentcurve.LineStyle as GraphicsStyle;
 
                
@@ -91,23 +97,17 @@ namespace Session04Challenge
                 Wall newWall2 = Wall.Create(doc, Curve1, solidWT.Id, newLevel.Id, 20, 0, false, false);
 
                         break;
-                   case "M-Duct":
-                //M-Duct
-                Duct newDuct = Duct.Create(doc, ductSystemType.Id, ductType.Id, newLevel.Id, startPoint, endPoint);                        
+                    case "M-DUCT":
+                        //M-Duct
+                Duct newDuct = Duct.Create(doc, ductSystemType.Id, ductType.Id, newLevel.Id, Curve1.GetEndPoint(0), Curve1.GetEndPoint(1));                        
                         break;
                     case "P-PIPE":
                 //P-PIPE
-               Pipe newPipe = Pipe.Create(doc, pipeSystemType.Id, pipeType.Id, newLevel.Id, startPoint, endPoint);                        
+                Pipe newPipe = Pipe.Create(doc, pipeSystemType.Id, pipeType.Id, newLevel.Id, Curve1.GetEndPoint(0), Curve1.GetEndPoint(1));                        
                        break;
                     default:
                         break;
                 }
-
-
-
-
-
-
 
             }
             t.Commit();
@@ -168,13 +168,11 @@ namespace Session04Challenge
                 if (ductWT.Name == ductType)
                     return ductWT;
             }
-
-
             return null;
 
         }   
         private MEPSystemType GetMEPSystemTypeByName(Document doc, string MEPtype)
-    {
+        {
         FilteredElementCollector collector = new FilteredElementCollector(doc);
         collector.OfClass(typeof(MEPSystemType));
 
