@@ -82,7 +82,6 @@ namespace Session04Challenge
                 switch(currentGS.Name)
                 {
                     case "A-GLAZ":
-                       
                 //A-GLAZ
                 Wall newWall = Wall.Create(doc, Curve1, glazingWT.Id, newLevel.Id, 20, 0, false, false); 
                         break;
